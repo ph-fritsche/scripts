@@ -1,6 +1,26 @@
-import type { script } from '../type'
+import type { config, script } from '../type'
 import { getOptionIdent } from './getOptionIdent'
 import { printTable } from './printTable'
+
+const main = {
+    description: 'Run scripts',
+    usage: '<scriptId> [options] [...args]',
+}
+
+export function printMainUsage(config: config, stream: NodeJS.WriteStream) {
+    stream.write(`\n${main.description}\n`)
+
+    stream.write(`\nUsage:${main.usage}\n`)
+
+    stream.write(`\nAvailable scripts:\n`)
+    const scriptsTable: (string | undefined)[][] = []
+    for(const id in config.scripts) {
+        scriptsTable.push([, id, '-->', config.scripts[id]])
+    }
+    printTable(stream, scriptsTable)
+
+    stream.write('\n')
+}
 
 export function printUsage(scriptId: string, script: script, stream: NodeJS.WriteStream) {
     let cmd = [
@@ -46,4 +66,6 @@ export function printUsage(scriptId: string, script: script, stream: NodeJS.Writ
         stream.write(`\nArguments:\n`)
         printTable(stream, argTable)
     }
+
+    stream.write('\n')
 }
