@@ -8,10 +8,11 @@ export interface config {
 }
 
 export type optionDef = {
-    id: string,
+    short?: string | false,
+    long?: string | false,
     description?: string,
-    values?: optionValDef[],
-    required?: boolean,
+    value?: optionValDef[],
+    multiple?: boolean,
 }
 
 export type optionValDef = string
@@ -19,23 +20,29 @@ export type optionValDef = string
 export type argumentDef = {
     id: string,
     description?: string,
-    required?: boolean,
+}
+
+export type stringMap = {
+    [k: string]: string
 }
 
 export type params = {
     options: {
-        [id: string]: boolean | string | string[],
+        [id: string]: boolean | string | string[] | stringMap | stringMap[],
     }
     args: {
         [id: string]: string,
     }
-    rest: string[],
+    variadic: string[],
 }
 
 export interface script {
     description?: string,
-    options?: optionDef[],
-    args?: argumentDef[],
-    rest?: argumentDef,
+    options?: {
+        [k: string]: optionDef,
+    }
+    requiredArgs?: argumentDef[],
+    optionalArgs?: argumentDef[],
+    variadicArgs?: argumentDef,
     run: (params: params) => void,
 }

@@ -1,25 +1,38 @@
 import fs from 'fs'
 import process from 'process'
-import type { params, script } from '../type'
+import type { params, script, stringMap } from '../type'
 
 const script: script = {
-    options: [
-        {id: '-in', description: 'Directory where files should be renamed', values: ['dir']},
-        {id: '-i', description: 'Case-Insensitive'},
-        {id: '-r', description: 'Include sub-directories'},
-        {id: '-dry', description: 'Dry run'}
-    ],
-    args: [
-        {id: 'search', description: 'Regexp search pattern', required: true},
-        {id: 'replace', description: 'Replacement', required: true},
+    options: {
+        in: {
+            description: 'Directory where files should be renamed',
+            value: ['dir']
+        },
+        caseInsensitive: {
+            short: 'i',
+            long: false,
+            description: 'Case-Insensitive'
+        },
+        recursive: {
+            short: 'r',
+            long: false,
+            description: 'Include sub-directories'
+        },
+        dry: {
+            description: 'Dry run',
+        }
+    },
+    requiredArgs: [
+        {id: 'search', description: 'Regexp search pattern'},
+        {id: 'replace', description: 'Replacement'},
     ],
     run(params: params) {
-        if (typeof (params.options['-in']) === 'string') {
-            process.chdir(params.options['-in'])
+        if (params.options.in) {
+            process.chdir((params.options.in as stringMap).dir)
         }
 
         const regexp = new RegExp(params.args.search, [
-            params.options['-i'] && 'i'
+            params.options.caseInsensitive && 'i'
         ].filter(Boolean).join(''))
 
         mvRegExp()
@@ -30,7 +43,7 @@ const script: script = {
 
             for (const f of d) {
                 if (fs.lstatSync(f).isDirectory()) {
-                    if (params.options['-r']) {
+                    if (params.options.recursive) {
                         process.chdir(f)
                         mvRegExp()
                         process.chdir(cwd)
@@ -42,8 +55,9 @@ const script: script = {
 
                 if (newName !== f) {
                     process.stdout.write(`${f} => ${newName}\n`)
-                    if (!params.options['-dry']) {
-                        fs.renameSync(f, newName)
+                    if (!params.options.dry) {
+                        console.log('RENAME')
+                        // fs.renameSync(f, newName)
                     }
                 }
             }

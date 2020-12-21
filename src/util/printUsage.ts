@@ -1,39 +1,45 @@
-import type { argumentDef, script } from '../type'
+import type { script } from '../type'
+import { getOptionIdent } from './getOptionIdent'
 import { printTable } from './printTable'
 
 export function printUsage(scriptId: string, script: script, stream: NodeJS.WriteStream) {
     let cmd = [
         scriptId,
         script.options?.length && '[options]',
-        ...(script.args ?? []).map(a => a.required ? `<${a.id}>` : `[${a.id}]`),
-        script.rest && `[...${script.rest.id}]`,
+        ...(script.requiredArgs ?? []).map(a => `<${a.id}>`),
+        ...(script.optionalArgs ?? []).map(a => `[${a.id}]`),
+        script.variadicArgs && `[...${script.variadicArgs.id}]`,
     ].filter(Boolean).join(' ')
 
     stream.write(`Usage: ${cmd}\n`)
 
-    if (script.options?.length) {
+    const options = script.options
+    if (options) {
         stream.write(`\nOptions:\n`)
-        printTable(stream, script.options.map(o => [
-            ,
-            o.id + (o.values ?? []).map(i => ` <${i}>`),
-            o.description
-        ]))
-    }
-
-    const argTable: argumentDef[] = script.args ?? []
-    if (script.rest) {
-        argTable.push(script.rest)
-    }
-
-    if (argTable.length) {
-        stream.write(`\nArguments:\n`)
-        printTable(stream, argTable.map((a, i) => {
-            const id = (i === argTable.length - 1 && script.rest)
-                ? `...${a.id}`
-                : `${a.id}` + (a.required ? '' : '?')
-
-            return [, id, a.description]
+        printTable(stream, Object.keys(options).map(k => {
+            const o = options[k]
+            return [
+                ,
+                [getOptionIdent('short', k, o), getOptionIdent('long', k, o)].filter(Boolean).join(', '),
+                (o.value ?? []).map(i => `<${i}>`).join(' '),
+                o.description
+            ]
         }))
     }
-}
 
+    const argTable: (string | undefined)[][] = []
+    script.requiredArgs?.forEach(a => {
+        argTable.push([, `<${a.id}>`, a.description])
+    })
+    script.optionalArgs?.forEach(a => {
+        argTable.push([, `[${a.id}]`, a.description])
+    })
+    if (script.variadicArgs) {
+        const a = script.variadicArgs
+        argTable.push([, `[...${a.id}]`, a.description])
+    }
+    if (argTable.length) {
+        stream.write(`\nArguments:\n`)
+        printTable(stream, argTable)
+    }
+}
