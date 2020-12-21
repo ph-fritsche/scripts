@@ -3,6 +3,7 @@ import process from 'process'
 import type { params, script, stringMap } from '../type'
 
 const script: script = {
+    description: 'Rename files per RegExp',
     options: {
         in: {
             description: 'Directory where files should be renamed',

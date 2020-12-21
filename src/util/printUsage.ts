@@ -5,13 +5,17 @@ import { printTable } from './printTable'
 export function printUsage(scriptId: string, script: script, stream: NodeJS.WriteStream) {
     let cmd = [
         scriptId,
-        script.options?.length && '[options]',
+        Object.keys(script.options ?? {}).length && '[options]',
         ...(script.requiredArgs ?? []).map(a => `<${a.id}>`),
         ...(script.optionalArgs ?? []).map(a => `[${a.id}]`),
         script.variadicArgs && `[...${script.variadicArgs.id}]`,
     ].filter(Boolean).join(' ')
-
-    stream.write(`Usage: ${cmd}\n`)
+    
+    if (script.description) {
+        stream.write(`\n${script.description}\n`)
+    }
+    
+    stream.write(`\nUsage:\n  ${cmd}\n`)
 
     const options = script.options
     if (options) {
