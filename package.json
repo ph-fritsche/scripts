@@ -5,7 +5,7 @@
     "repository": "https://github.com/ph-fritsche/scripts.git",
     "license": "MIT",
     "bin": {
-        "phf-scripts": "dist/bin.js"
+        "scripts": "bin/scripts.js"
     },
     "main": "dist/index.js",
     "devDependencies": {
@@ -13,5 +13,8 @@
     },
     "dependencies": {
         "@types/node": "^14.14.14"
+    },
+    "scripts": {
+        "scripts": "node bin/scripts.js"
     }
 }
