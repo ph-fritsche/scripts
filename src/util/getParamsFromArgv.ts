@@ -1,9 +1,13 @@
-import { optionValDef, params, script, stringMap } from "../type"
-import { getOptionIdent } from "./getOptionIdent"
-import { printError } from "./printError"
-import { printUsage } from "./printUsage"
+import { optionValDef, params, script, stringMap } from '../type'
+import { getOptionIdent } from './getOptionIdent'
+import { printError } from './printError'
+import { printUsage } from './printUsage'
 
-export function getParamsFromArgs(scriptId: string, script: script, argv: string[]) {
+export function getParamsFromArgs(
+    scriptId: string,
+    script: script,
+    argv: string[],
+): params {
     const params: params = { options: {}, args: {}, variadic: [] }
 
     const required = (script.requiredArgs?.length ?? 0)
@@ -44,7 +48,7 @@ function readOptionArg(
     script: script,
     argv: string[],
     index: number,
-    params: params
+    params: params,
 ) {
     const options = script.options ?? {}
     const ids = Object.keys(options)

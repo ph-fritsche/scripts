@@ -1,5 +1,5 @@
 import fs from 'fs'
-import type { config } from "../type"
+import type { config } from '../type'
 
 export async function resolveConfig(configBasename: string): Promise<config> {
     const configFilename = process.cwd() + '/' + configBasename
@@ -10,4 +10,3 @@ export async function resolveConfig(configBasename: string): Promise<config> {
 
     return config
 }
-

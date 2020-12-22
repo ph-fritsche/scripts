@@ -1,4 +1,4 @@
-import type { config, script } from "../type"
+import type { config, script } from '../type'
 
 export async function resolveScript(config: config, scriptId: string): Promise<script> {
     if (!config.scripts || !config.scripts[scriptId]) {

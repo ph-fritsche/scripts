@@ -1,14 +1,14 @@
 import { getParamsFromArgs } from './util/getParamsFromArgv'
-import { printMainUsage, printUsage } from './util/printUsage'
+import { printMainUsage } from './util/printUsage'
 import { resolveConfig } from './util/resolveConfig'
 import { resolveScript } from './util/resolveScript'
 
 const configBasename = 'scripts.config.js'
 
-export async function run() {
+export async function run(): Promise<void> {
     const resolvedConfig = await resolveConfig(configBasename)
 
-    const [bin, self, scriptId, ...argv] = process.argv
+    const [, , scriptId, ...argv] = process.argv
 
     if (scriptId === '--help' || scriptId === '') {
         printMainUsage(resolvedConfig, process.stdout)

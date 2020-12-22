@@ -1,4 +1,7 @@
-export function printTable(stream: NodeJS.WriteStream, table: (string | undefined)[][]) {
+export function printTable(
+    stream: NodeJS.WriteStream,
+    table: (string | undefined)[][],
+): void {
     const width: number[] = []
     const print: string[][] = []
     table.forEach(row => {
