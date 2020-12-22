@@ -1,5 +1,5 @@
 {
-    "name": "@ph.fritsche/scripts",
+    "name": "shared-scripts",
     "description": "Shared scripts",
     "author": "Philipp Fritsche",
     "repository": "https://github.com/ph-fritsche/scripts.git",
