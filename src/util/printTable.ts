@@ -15,13 +15,14 @@ export function printTable(
         })
     })
 
+    const cols = Math.max(...print.map(r => r.length))
     print.forEach(row => {
-        row.forEach((col = '', i) => {
+        for (let i = 0; i < cols; i++) {
             if (i > 0) {
                 stream.write('  ')
             }
-            stream.write(col.padEnd(width[i]))
-        })
+            stream.write((row[i] ?? '').padEnd(width[i]))
+        }
         stream.write('\n')
     })
 }
