@@ -1,4 +1,4 @@
-import { getParamsFromArgs } from './util/getParamsFromArgv'
+import { getParamsFromArgv } from './util/getParamsFromArgv'
 import { printMainUsage } from './util/printUsage'
 import { resolveConfig } from './util/resolveConfig'
 import { resolveScript } from './util/resolveScript'
@@ -17,7 +17,7 @@ export async function run(): Promise<void> {
 
     const script = await resolveScript(resolvedConfig, scriptId)
 
-    const params = getParamsFromArgs(scriptId, script, argv)
+    const params = getParamsFromArgv(scriptId, script, argv)
 
     script.run(params)
 }

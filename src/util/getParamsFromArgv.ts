@@ -3,7 +3,7 @@ import { getOptionIdent } from './getOptionIdent'
 import { printError } from './printError'
 import { printUsage } from './printUsage'
 
-export function getParamsFromArgs(
+export function getParamsFromArgv(
     scriptId: string,
     script: script,
     argv: string[],
