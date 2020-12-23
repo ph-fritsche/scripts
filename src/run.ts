@@ -6,18 +6,36 @@ import { resolveScript } from './util/resolveScript'
 const configBasename = 'scripts.config.js'
 
 export async function run(): Promise<void> {
-    const resolvedConfig = await resolveConfig(configBasename)
-
-    const [, , scriptId, ...argv] = process.argv
-
-    if (scriptId === '--help' || scriptId === '') {
-        printMainUsage(resolvedConfig, process.stdout)
-        process.exit(0)
+    const streams = {
+        in: process.stdin,
+        out: process.stdout,
+        err: process.stderr,
     }
+    const exit = process.exit
 
-    const script = await resolveScript(resolvedConfig, scriptId)
+    try {
+        const resolvedConfig = await resolveConfig(configBasename)
 
-    const params = getParamsFromArgv(scriptId, script, argv)
+        const [, , scriptId, ...argv] = process.argv
 
-    script.run(params)
+        if (scriptId === '--help' || scriptId === '') {
+            printMainUsage(resolvedConfig, streams.out)
+            throw 0
+        }
+
+        const script = await resolveScript(streams, resolvedConfig, scriptId)
+
+        const params = getParamsFromArgv(streams, scriptId, script, argv)
+
+        script.run(params)
+
+    } catch(code) {
+        exit(typeof(code) === 'number' ? code : 2)
+    }
+}
+
+export type streams = {
+    in: NodeJS.ReadStream,
+    out: NodeJS.WriteStream,
+    err: NodeJS.WriteStream,
 }
