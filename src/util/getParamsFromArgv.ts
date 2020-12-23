@@ -1,5 +1,5 @@
 import type { streams } from '../run'
-import { optionValDef, params, script, stringMap } from '../type'
+import type { argumentDef, optionValDef, params, script, stringMap } from '../type'
 import { getOptionIdent } from './getOptionIdent'
 import { printUsage } from './printUsage'
 
@@ -29,7 +29,7 @@ export function getParamsFromArgv(
             params.args[arg.id] = argv[i]
 
         } else if (script.optionalArgs && Object.keys(params.args).length < required + script.optionalArgs.length) {
-            const arg = (script.optionalArgs)[Object.keys(params.args).length]
+            const arg = (script.optionalArgs)[Object.keys(params.args).length - required]
             params.args[arg.id] = argv[i]
 
         } else if (script.variadicArgs) {
@@ -39,6 +39,12 @@ export function getParamsFromArgv(
         } else {
             error(streams, scriptId, script, `Extraneous argument: ${argv[i]}`)
         }
+    }
+
+    const found = Object.keys(params.args).length
+    if (found < required) {
+        const missingArg = (script.requiredArgs as argumentDef[])[found]
+        error(streams, scriptId, script, `Missing argument ${found} "${missingArg.description ?? ''}"`)
     }
 
     return params
@@ -110,7 +116,7 @@ function readOptionArg(
             if (argvSlice.length < i) {
                 error(streams, scriptId, script, `Missing parameter ${i} "${valueIds[i]}" for option "${namedBy}"`)
             }
-            o[vId] = argv[index + 1 + i]
+            o[vId] = argvSlice[i]
         })
         if (options[id].multiple) {
             if (Array.isArray(params.options[id])) {
