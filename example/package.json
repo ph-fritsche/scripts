@@ -3,7 +3,8 @@
     "private": true,
     "dependencies": {
         "package-a": "just-make-sure-nobody-accidentally-installs-here",
-        "package-b": "just-make-sure-nobody-accidentally-installs-here"
+        "package-b": "just-make-sure-nobody-accidentally-installs-here",
+        "package-c": "just-make-sure-nobody-accidentally-installs-here"
     },
     "scripts": {
         "scripts": "node ../bin/scripts"
