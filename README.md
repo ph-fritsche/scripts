@@ -45,11 +45,11 @@ module.exports = {
     extends: [
         // reference other configs by require-resolvable names ...
     ],
-    scripts: [
+    scripts: {
         // reference scripts by require-resolvable names ...
         'foo': '@myNamespace/myScriptCollection/foo',
         'echo': __dirname + '/myScript',
-    ],
+    },
 }
 ```
 
