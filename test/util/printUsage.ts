@@ -23,6 +23,13 @@ function setupMain() {
     return { getOutput: () => output, print }
 }
 
+it('print description', () => {
+    const { getOutput, print } = setup()
+
+    print({ description: 'this script does something' })
+    expect(getOutput()).toMatch(/this script does something/)
+})
+
 it('print options', () => {
     const { getOutput, print } = setup()
 
