@@ -43,7 +43,7 @@ export function getParamsFromArgv(
     const found = Object.keys(params.args).length
     if (found < required) {
         const missingArg = (script.requiredArgs as argumentDef[])[found]
-        error(streams, scriptId, script, `Missing argument ${found} "${missingArg.description ?? ''}"`)
+        error(streams, scriptId, script, `Missing argument ${found} "${missingArg.description ?? missingArg.id}"`)
     }
 
     return params
