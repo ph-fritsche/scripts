@@ -113,7 +113,7 @@ function readOptionArg(
         const valueIds = options[id].value as optionValDef[]
         const o: stringMap = {}
         valueIds.forEach((vId, i) => {
-            if (argvSlice.length < i) {
+            if (argvSlice.length <= i) {
                 error(streams, scriptId, script, `Missing parameter ${i} "${valueIds[i]}" for option "${namedBy}"`)
             }
             o[vId] = argvSlice[i]
