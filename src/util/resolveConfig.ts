@@ -34,7 +34,7 @@ async function resolveConfigExtensions(config: config, resolved: string[] = []):
             throw `Circular reference for "${c}"\n${resolved.join(' -> ')}`
         }
 
-        return dynamicImport(c).then(m => m.default ?? m).then(c => resolveConfigExtensions(c, resolved.concat(c)))
+        return dynamicImport(c).then(m => m.default ?? m).then(m => resolveConfigExtensions(m, resolved.concat(c)))
     })).then(extendedConfigs => {
         extendedConfigs.forEach(c => {
             scripts = {...scripts, ...c.scripts}
