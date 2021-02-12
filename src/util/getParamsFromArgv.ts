@@ -33,7 +33,6 @@ export function getParamsFromArgv(
             params.args[arg.id] = argv[i]
 
         } else if (script.variadicArgs) {
-            params.variadic = params.variadic ?? []
             params.variadic.push(argv[i])
 
         } else {
@@ -95,7 +94,7 @@ function readOptionArg(
                     const argRest = argv[index].substr(i + 1)
                     readOptionValue(id, '-' + short, (argRest ? [argRest] : []).concat(argv.slice(index + 1)))
 
-                    return (options[id].value?.length ?? 0)
+                    return (options[id].value as string[]).length
                 } else {
                     params.options[id] = true
                     found = true
