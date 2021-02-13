@@ -18,7 +18,7 @@ export async function run(): Promise<void> {
 
         const [, , scriptId, ...argv] = process.argv
 
-        if (scriptId === '--help' || scriptId === '') {
+        if (scriptId === '--help' || !scriptId) {
             printMainUsage(resolvedConfig, streams.out)
             throw 0
         }
