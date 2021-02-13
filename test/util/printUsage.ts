@@ -1,5 +1,5 @@
 import { config, script } from '../../src/type'
-import { printMainUsage, printUsage } from '../../src/util/printUsage'
+import { printMainUsage, printUsage } from '../../src/util'
 
 function setup() {
     let output = ''

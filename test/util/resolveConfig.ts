@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { resolveConfig } from '../../src/util/resolveConfig'
+import { resolveConfig } from '../../src/util'
 import exampleImport from '../../example/import'
 import dynamicImport from '../../src/util/import'
 

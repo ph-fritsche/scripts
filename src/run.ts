@@ -1,37 +1,26 @@
-import { getParamsFromArgv } from './util/getParamsFromArgv'
-import { printMainUsage } from './util/printUsage'
-import { resolveConfig } from './util/resolveConfig'
-import { resolveScript } from './util/resolveScript'
+import { stderr, stdin, stdout } from 'process'
+import { getParamsFromArgv, printMainUsage, resolveConfig, resolveScript } from './util'
 
 const configBasename = 'scripts.config.js'
 
-export async function run(): Promise<void> {
-    const streams = {
-        in: process.stdin,
-        out: process.stdout,
-        err: process.stderr,
+export async function run(
+    scriptId = '',
+    scriptArgs: string[] = [],
+): Promise<void> {
+    const streams = { in: stdin, out: stdout, err: stderr }
+
+    const resolvedConfig = await resolveConfig(configBasename)
+
+    if (scriptId === '--help' || scriptId === '') {
+        printMainUsage(resolvedConfig, streams.out)
+        throw 0
     }
-    const exit = process.exit
 
-    try {
-        const resolvedConfig = await resolveConfig(configBasename)
+    const script = await resolveScript(streams, resolvedConfig, scriptId)
 
-        const [, , scriptId, ...argv] = process.argv
+    const params = getParamsFromArgv(streams, scriptId, script, scriptArgs)
 
-        if (scriptId === '--help' || !scriptId) {
-            printMainUsage(resolvedConfig, streams.out)
-            throw 0
-        }
-
-        const script = await resolveScript(streams, resolvedConfig, scriptId)
-
-        const params = getParamsFromArgv(streams, scriptId, script, argv)
-
-        script.run(params)
-
-    } catch(code) {
-        exit(typeof(code) === 'number' ? code : 2)
-    }
+    script.run(params)
 }
 
 export type streams = {

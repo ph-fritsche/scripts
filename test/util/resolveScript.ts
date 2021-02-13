@@ -1,5 +1,5 @@
 import type { streams } from '../../src/run'
-import { resolveScript } from '../../src/util/resolveScript'
+import { resolveScript } from '../../src/util'
 import exampleImport from '../../example/import'
 
 jest.mock('../../src/util/import', () => ((module: string) => exampleImport(module)))

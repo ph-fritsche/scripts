@@ -1,7 +1,6 @@
 import { streams } from '../../src/run'
 import { params, script } from '../../src/type'
-import { getParamsFromArgv } from '../../src/util/getParamsFromArgv'
-import { printUsage } from '../../src/util/printUsage'
+import { getParamsFromArgv, printUsage } from '../../src/util'
 
 jest.mock('../../src/util/printUsage', () => ({
     printUsage: jest.fn(),
