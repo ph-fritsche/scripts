@@ -2,6 +2,7 @@ import fs from 'fs'
 import { resolveConfig } from '../../src/util'
 import exampleImport from '../../example/import'
 import dynamicImport from '../../src/util/import'
+import { stringify } from 'querystring'
 
 jest.mock('../../src/util/import', () => ({
     __esModule: true,
@@ -22,10 +23,12 @@ beforeEach(() => {
     importMock.mockImplementation((module: string) => exampleImport(module))
 })
 
-it('resolve with empty object if config does not exist', () => {
+it('resolve with empty scripts object if config does not exist', () => {
     const config = resolveConfig('non-existent-config.js')
 
     return expect(config).resolves.toEqual({
+        configPath: expect.stringContaining('not found'),
+        extends: {},
         scripts: {},
     })
 })
@@ -51,6 +54,13 @@ it('resolve extensions', () => {
     const config = resolveConfig('scripts.config.js')
 
     return expect(config).resolves.toEqual({
+        configPath: exampleDir + '/scripts.config.js',
+        extends: {
+            'package-b': {
+                'package-a': {},
+            },
+            'package-c': {},
+        },
         scripts: {
             'baz0': {
                 configuredBy: exampleDir + '/scripts.config.js',

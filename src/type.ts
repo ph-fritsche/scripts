@@ -7,10 +7,16 @@ export interface config {
     },
 }
 
+interface extended {
+    [k: string]: extended,
+}
+
 export interface resolvedConfig {
+    configPath: string,
+    extends: extended,
     scripts: {
         [id: string]: {
-            configuredBy: string,
+            configuredBy: string[],
             script: resolvableName | script,
         },
     },

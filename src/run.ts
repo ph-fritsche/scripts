@@ -16,7 +16,7 @@ export async function run(
         throw 0
     }
 
-    const script = await resolveScript(streams, resolvedConfig, scriptId)
+    const script = await resolveScript(streams, resolvedConfig.scripts, scriptId)
 
     const params = getParamsFromArgv(streams, scriptId, script, scriptArgs)
 

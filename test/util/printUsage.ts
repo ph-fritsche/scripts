@@ -65,16 +65,20 @@ it('print variadic arguments', () => {
 it('list available scripts', () => {
     const { getOutput, print } = setupMain()
 
-    print({scripts: {
-        foo: {
-            configuredBy: 'any',
-            script: 'package-foo',
+    print({
+        configPath: 'any',
+        extends: {},
+        scripts: {
+            foo: {
+                configuredBy: ['any'],
+                script: 'package-foo',
+            },
+            bar: {
+                configuredBy: ['any'],
+                script: 'package-bar',
+            },
         },
-        bar: {
-            configuredBy: 'any',
-            script: 'package-bar',
-        },
-    }})
+    })
 
     expect(getOutput()).toMatch(/foo\s+-->\s+package-foo/)
     expect(getOutput()).toMatch(/bar\s+-->\s+package-bar/)

@@ -25,6 +25,8 @@ type Resolve<T> = T extends PromiseLike<infer U> ? Resolve<U> : T
 
 function setup({
     config = {
+        configPath: '',
+        extends: {},
         scripts: {},
     },
     params = {
@@ -84,7 +86,7 @@ test('pass first argument as scriptId', async () => {
 
     await expect(run('foo', ['a', 'b', 'c'])).resolves.toBe(undefined)
 
-    expect(utilMock.resolveScript).toBeCalledWith({in: stdin, out: stdout, err: stderr}, config, 'foo')
+    expect(utilMock.resolveScript).toBeCalledWith({in: stdin, out: stdout, err: stderr}, config.scripts, 'foo')
 })
 
 test('run script with resolved params', async () => {

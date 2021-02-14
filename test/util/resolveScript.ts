@@ -22,11 +22,9 @@ it('resolve package', async () => {
     const { streams } = setup()
 
     const script = resolveScript(streams, {
-        scripts: {
-            a: {
-                configuredBy: 'any',
-                script: 'package-b/echo',
-            },
+        a: {
+            configuredBy: ['any'],
+            script: 'package-b/echo',
         },
     }, 'a')
 
@@ -35,13 +33,10 @@ it('resolve package', async () => {
 
 it('resolve inline script', async () => {
     const config = {
-        scripts: {
-            a: {
-                configuredBy: 'any',
-                definedIn: 'any',
-                script: {
-                    run: () => { return },
-                },
+        a: {
+            configuredBy: ['any'],
+            script: {
+                run: () => { return },
             },
         },
     }
@@ -49,18 +44,16 @@ it('resolve inline script', async () => {
 
     const script = resolveScript(streams, config, 'a')
 
-    return expect(script).resolves.toBe(config.scripts.a.script)
+    return expect(script).resolves.toBe(config.a.script)
 })
 
 it('report error for undefined script', async () => {
     const { streams, getErrput } = setup()
 
     const script = resolveScript(streams, {
-        scripts: {
-            a: {
-                configuredBy: 'any',
-                script: 'package-b/echo',
-            },
+        a: {
+            configuredBy: ['any'],
+            script: 'package-b/echo',
         },
     }, 'b')
 
@@ -73,11 +66,9 @@ it('report error if the (default) export has no run() method', () => {
     const { streams, getErrput } = setup()
 
     const script = resolveScript(streams, {
-        scripts: {
-            a: {
-                configuredBy: 'any',
-                script: __dirname.concat('/resolveScript'),
-            },
+        a: {
+            configuredBy: ['any'],
+            script: __dirname.concat('/resolveScript'),
         },
     }, 'a')
 
