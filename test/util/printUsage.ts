@@ -1,4 +1,4 @@
-import { config, script } from '../../src/type'
+import { config, resolvedConfig, script } from '../../src/type'
 import { printMainUsage, printUsage } from '../../src/util'
 
 function setup() {
@@ -15,9 +15,9 @@ function setup() {
 function setupMain() {
     let output = ''
     const stream = { write: (c: string) => { output = output.concat(c) } }
-    const print = (config: Partial<config>) => {
+    const print = (config: resolvedConfig) => {
         output = ''
-        printMainUsage(config as config, stream as NodeJS.WriteStream)
+        printMainUsage(config, stream as NodeJS.WriteStream)
     }
 
     return { getOutput: () => output, print }
@@ -66,8 +66,14 @@ it('list available scripts', () => {
     const { getOutput, print } = setupMain()
 
     print({scripts: {
-        foo: 'package-foo',
-        bar: 'package-bar',
+        foo: {
+            configuredBy: 'any',
+            script: 'package-foo',
+        },
+        bar: {
+            configuredBy: 'any',
+            script: 'package-bar',
+        },
     }})
 
     expect(getOutput()).toMatch(/foo\s+-->\s+package-foo/)

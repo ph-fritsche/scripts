@@ -24,7 +24,9 @@ const utilMock = {
 type Resolve<T> = T extends PromiseLike<infer U> ? Resolve<U> : T
 
 function setup({
-    config = {},
+    config = {
+        scripts: {},
+    },
     params = {
         options: {},
         args: {},

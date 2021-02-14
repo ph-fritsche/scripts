@@ -52,12 +52,38 @@ it('resolve extensions', () => {
 
     return expect(config).resolves.toEqual({
         scripts: {
-            'baz0': 'package-a/baz',
-            'echo': packageDirB + '/echo',
-            'bar': 'package-a/bar',
-            'baz': packageDirB + '/baz',
-            'foo': packageDirA + '/foo',
-            'foobar': packageDirC + '/foobar',
+            'baz0': {
+                configuredBy: exampleDir + '/scripts.config.js',
+                script: 'package-a/baz',
+            },
+            'echo': {
+                configuredBy: 'package-b',
+                script: packageDirB + '/echo',
+            },
+            'bar': {
+                configuredBy: 'package-b',
+                script: 'package-a/bar',
+            },
+            'baz': {
+                configuredBy: 'package-b',
+                script: packageDirB + '/baz',
+            },
+            'foo': {
+                configuredBy: 'package-a',
+                script: packageDirA + '/foo',
+            },
+            'foobar': {
+                configuredBy: 'package-c',
+                script: packageDirC + '/foobar',
+            },
+            'inline': {
+                configuredBy: 'package-c',
+                script: expect.objectContaining({ run: expect.any(Function) }),
+            },
+            'inline-require': {
+                configuredBy: 'package-c',
+                script: expect.objectContaining({ run: expect.any(Function) }),
+            },
         },
     })
 })

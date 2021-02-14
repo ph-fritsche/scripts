@@ -1,4 +1,4 @@
-import type { config, script } from '../type'
+import type { resolvedConfig, script } from '../type'
 import { getOptionIdent } from './getOptionIdent'
 import { printTable } from './printTable'
 
@@ -7,7 +7,7 @@ const main = {
     usage: '<scriptId> [options] [...args]',
 }
 
-export function printMainUsage(config: config, stream: NodeJS.WriteStream): void {
+export function printMainUsage(config: resolvedConfig, stream: NodeJS.WriteStream): void {
     stream.write(`\n${main.description}\n`)
 
     stream.write(`\nUsage:${main.usage}\n`)
@@ -15,7 +15,8 @@ export function printMainUsage(config: config, stream: NodeJS.WriteStream): void
     stream.write(`\nAvailable scripts:\n`)
     const scriptsTable: (string | undefined)[][] = []
     for(const id in config.scripts) {
-        scriptsTable.push(['', id, '-->', config.scripts[id]])
+        const s = config.scripts[id].script
+        scriptsTable.push(['', id, '-->', typeof s === 'string' ? s : `[inline] ${config.scripts[id].configuredBy}`])
     }
     printTable(stream, scriptsTable)
 

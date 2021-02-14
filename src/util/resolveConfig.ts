@@ -1,15 +1,15 @@
 import fs from 'fs'
-import type { config } from '../type'
+import type { config, resolvedConfig } from '../type'
 import dynamicImport from './import'
 
-export async function resolveConfig(configBasename: string): Promise<config> {
+export async function resolveConfig(configBasename: string): Promise<resolvedConfig> {
     const configFilename = findConfigFile(configBasename)
 
     const primaryConfig = configFilename
         ? await dynamicImport(configFilename).then(m => m.default ?? m)
         : {}
 
-    return resolveConfigExtensions(primaryConfig)
+    return resolveConfigExtensions(configFilename ?? `[not found] ${configBasename}`, primaryConfig)
 }
 
 function findConfigFile(configBasename: string, dir: string = process.cwd()): string | undefined {
@@ -26,7 +26,7 @@ function findConfigFile(configBasename: string, dir: string = process.cwd()): st
     }
 }
 
-async function resolveConfigExtensions(config: config, resolved: string[] = []): Promise<config> {
+async function resolveConfigExtensions(configPath: string, config: config, resolved: string[] = []): Promise<resolvedConfig> {
     let scripts = {}
 
     return Promise.all((config.extends ?? []).map(async c => {
@@ -34,14 +34,20 @@ async function resolveConfigExtensions(config: config, resolved: string[] = []):
             throw `Circular reference for "${c}"\n${resolved.join(' -> ')}`
         }
 
-        return dynamicImport(c).then(m => m.default ?? m).then(m => resolveConfigExtensions(m, resolved.concat(c)))
+        return dynamicImport(c).then(m => m.default ?? m).then(m => resolveConfigExtensions(c, m, resolved.concat(c)))
     })).then(extendedConfigs => {
         extendedConfigs.forEach(c => {
             scripts = {...scripts, ...c.scripts}
         })
 
         return {
-            scripts: {...scripts, ...config.scripts},
+            scripts: {
+                ...scripts,
+                ...Object.fromEntries(Object.entries(config.scripts ?? {}).map(([id, script]) => [id, {
+                    configuredBy: configPath,
+                    script,
+                }])),
+            },
         }
     })
 }

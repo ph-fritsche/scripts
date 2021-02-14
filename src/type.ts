@@ -3,7 +3,16 @@ type resolvableName = string
 export interface config {
     extends?: string[],
     scripts?: {
-        [id: string]: resolvableName,
+        [id: string]: resolvableName | script,
+    },
+}
+
+export interface resolvedConfig {
+    scripts: {
+        [id: string]: {
+            configuredBy: string,
+            script: resolvableName | script,
+        },
     },
 }
 

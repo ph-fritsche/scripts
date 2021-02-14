@@ -51,6 +51,8 @@ module.exports = {
         // reference scripts by require-resolvable names ...
         'foo': '@myNamespace/myScriptCollection/foo',
         'echo': __dirname + '/myScript',
+        // or define them inline
+        'echo': require('./myScript'),
     },
 }
 ```
