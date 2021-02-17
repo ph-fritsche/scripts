@@ -26,11 +26,11 @@ function findConfigFile(configBasename: string, dir: string = process.cwd()): st
     }
 }
 
+type scriptsEntry = [string, resolvedConfig['scripts'][string]]
 async function resolveConfigExtensions(configPath: string, config: config, resolved: string[] = []): Promise<resolvedConfig> {
-    const extended = config.extends ?? []
-    let scripts = {}
+    const extendedNames = config.extends ?? []
 
-    const imports = Promise.all(extended.map(async c => {
+    const imports = Promise.all(extendedNames.map(async c => {
         if (resolved.includes(c)) {
             throw `Circular reference for "${c}"\n${resolved.join(' -> ')}`
         }
@@ -39,20 +39,28 @@ async function resolveConfigExtensions(configPath: string, config: config, resol
     }))
 
     return imports.then(extendedConfigs => {
-        extendedConfigs.forEach(c => {
-            scripts = {...scripts, ...c.scripts}
-        })
+        const extendedScriptsEntries = extendedConfigs.map(c => Object.entries(c.scripts)
+            .map<scriptsEntry>(([id, s]) => [
+                id,
+                {
+                    ...s,
+                    configuredBy: [c.configPath].concat(s.configuredBy),
+                },
+            ]),
+        )
+        const ownScriptsEntries = Object.entries(config.scripts ?? {})
+            .map<scriptsEntry>(([id, script]) => [
+                id,
+                {
+                    configuredBy: [],
+                    script,
+                },
+            ])
 
         return {
             configPath,
-            extends: Object.fromEntries(extended.map((k, i) => [k, extendedConfigs[i].extends])),
-            scripts: {
-                ...scripts,
-                ...Object.fromEntries(Object.entries(config.scripts ?? {}).map(([id, script]) => [id, {
-                    configuredBy: configPath,
-                    script,
-                }])),
-            },
+            extends: Object.fromEntries(extendedNames.map((k, i) => [k, extendedConfigs[i].extends])),
+            scripts: Object.fromEntries(([] as scriptsEntry[]).concat(...extendedScriptsEntries, ownScriptsEntries)),
         }
     })
 }

@@ -1,5 +1,5 @@
 import { stderr, stdin, stdout } from 'process'
-import { getParamsFromArgv, printMainUsage, resolveConfig, resolveScript } from './util'
+import { getParamsFromArgv, printConfig, printMainUsage, resolveConfig, resolveScript } from './util'
 
 const configBasename = 'scripts.config.js'
 
@@ -11,8 +11,12 @@ export async function run(
 
     const resolvedConfig = await resolveConfig(configBasename)
 
-    if (scriptId === '--help' || scriptId === '') {
-        printMainUsage(resolvedConfig, streams.out)
+    if (scriptId === '' || scriptId.startsWith('-')) {
+        if (scriptId === '--debug-config') {
+            printConfig(resolvedConfig, streams.out)
+        } else if (scriptId === '--help' || scriptId === '') {
+            printMainUsage(resolvedConfig, streams.out)
+        }
         throw 0
     }
 

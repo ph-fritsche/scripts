@@ -1,6 +1,6 @@
 import { run } from '../src'
 import { stdin, stdout, stderr } from 'process'
-import { getParamsFromArgv, printMainUsage, resolveConfig, resolveScript } from '../src/util'
+import { getParamsFromArgv, printConfig, printMainUsage, resolveConfig, resolveScript } from '../src/util'
 
 jest.mock('process', () => ({
     argv: [],
@@ -10,12 +10,14 @@ jest.mock('process', () => ({
 }))
 jest.mock('../src/util', () => ({
     getParamsFromArgv: jest.fn(),
+    printConfig: jest.fn(),
     printMainUsage: jest.fn(),
     resolveConfig: jest.fn(),
     resolveScript: jest.fn(),
 }))
 const utilMock = {
     getParamsFromArgv: getParamsFromArgv as jest.MockedFunction<typeof getParamsFromArgv>,
+    printConfig: printConfig as jest.MockedFunction<typeof printConfig>,
     printMainUsage: printMainUsage as jest.MockedFunction<typeof printMainUsage>,
     resolveConfig: resolveConfig as jest.MockedFunction<typeof resolveConfig>,
     resolveScript: resolveScript as jest.MockedFunction<typeof resolveScript>,
@@ -61,6 +63,15 @@ test('resolve config', async () => {
     await expect(run()).rejects.toBe(0)
 
     expect(utilMock.resolveConfig).toBeCalledWith('scripts.config.js')
+})
+
+test('print debug information on "--debug-config"', async () => {
+    const { run, config } = setup()
+
+    await expect(run('--debug-config')).rejects.toBe(0)
+
+    expect(utilMock.printConfig).toBeCalledWith(config, stdout)
+    expect(utilMock.resolveScript).not.toBeCalled()
 })
 
 test('print help if no scriptId is given', async () => {

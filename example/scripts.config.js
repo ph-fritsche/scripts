@@ -1,3 +1,5 @@
+const { stdout } = require('process')
+
 module.exports = {
     extends: [
         'package-b',
@@ -5,5 +7,10 @@ module.exports = {
     ],
     scripts: {
         'baz0': 'package-a/baz',
+        'inline-main': {
+            run() {
+                stdout.write('Hello, World!')
+            },
+        },
     },
 }

@@ -63,35 +63,39 @@ it('resolve extensions', () => {
         },
         scripts: {
             'baz0': {
-                configuredBy: exampleDir + '/scripts.config.js',
+                configuredBy: [],
                 script: 'package-a/baz',
             },
             'echo': {
-                configuredBy: 'package-b',
+                configuredBy: ['package-b'],
                 script: packageDirB + '/echo',
             },
             'bar': {
-                configuredBy: 'package-b',
+                configuredBy: ['package-b'],
                 script: 'package-a/bar',
             },
             'baz': {
-                configuredBy: 'package-b',
+                configuredBy: ['package-b'],
                 script: packageDirB + '/baz',
             },
             'foo': {
-                configuredBy: 'package-a',
+                configuredBy: ['package-b', 'package-a'],
                 script: packageDirA + '/foo',
             },
             'foobar': {
-                configuredBy: 'package-c',
+                configuredBy: ['package-c'],
                 script: packageDirC + '/foobar',
             },
             'inline': {
-                configuredBy: 'package-c',
+                configuredBy: ['package-c'],
                 script: expect.objectContaining({ run: expect.any(Function) }),
             },
             'inline-require': {
-                configuredBy: 'package-c',
+                configuredBy: ['package-c'],
+                script: expect.objectContaining({ run: expect.any(Function) }),
+            },
+            'inline-main': {
+                configuredBy: [],
                 script: expect.objectContaining({ run: expect.any(Function) }),
             },
         },

@@ -52,6 +52,21 @@ it('list scripts', async () => {
     expect(getOutput()).toEqual(expect.stringContaining('Available scripts:'))
 })
 
+it('debug config', async () => {
+    const { getOutput, getErrput, run } = setup()
+
+    run(['--debug-config'])
+
+    await wait()
+
+    expect(getErrput()).toBe('')
+    expect(streamsMock.out).toBeCalled()
+    expect(getOutput()).toMatch(/config:/i)
+    expect(getOutput()).toMatch(/extends:/i)
+    expect(getOutput()).toMatch(/scripts:/i)
+    expect(getOutput()).toMatchSnapshot()
+})
+
 it('run "foo" from "package-a"', async () => {
     const { getOutput, getErrput, run } = setup()
 

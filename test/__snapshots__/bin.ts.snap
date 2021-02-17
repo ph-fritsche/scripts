@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`debug config 1`] = `
+"config: scripts.config.js
+
+extends:
+  package-b
+    package-a
+  package-c
+
+scripts:
+  foo -> package-b -> package-a -> node_modules/package-a/foo.js
+  baz -> package-b -> node_modules/package-b/baz.js
+  echo -> package-b -> node_modules/package-b/echo.js
+  bar -> package-b -> package-a/bar
+  foobar -> package-c -> node_modules/package-c/foobar.js
+  inline -> package-c
+  inline-require -> package-c
+  baz0 -> package-a/baz
+  inline-main
+"
+`;
