@@ -23,7 +23,7 @@
     "dependencies": {},
     "scripts": {
         "scripts": "node bin/scripts.js",
-        "lint": "eslint src",
+        "lint": "eslint src test",
         "test": "jest",
         "build": "tsc"
     }

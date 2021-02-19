@@ -2,7 +2,6 @@ import fs from 'fs'
 import { resolveConfig } from '../../src/util'
 import exampleImport from '../../example/import'
 import dynamicImport from '../../src/util/import'
-import { stringify } from 'querystring'
 
 jest.mock('../../src/util/import', () => ({
     __esModule: true,
@@ -13,7 +12,6 @@ const importMock = dynamicImport as unknown as jest.MockedFunction<typeof dynami
 const exampleDir = fs.realpathSync(__dirname + '/../../example/')
 const packageDirA = fs.realpathSync(exampleDir + '/node_modules/package-a')
 const packageDirB = fs.realpathSync(exampleDir + '/node_modules/package-b')
-const packageDirC = fs.realpathSync(exampleDir + '/node_modules/package-c')
 
 beforeAll(() => {
     process.chdir(exampleDir)
@@ -61,15 +59,7 @@ it('resolve extensions', () => {
             },
             'package-c': {},
         },
-        scripts: {
-            'baz0': {
-                configuredBy: [],
-                script: 'package-a/baz',
-            },
-            'echo': {
-                configuredBy: ['package-b'],
-                script: packageDirB + '/echo',
-            },
+        scripts: expect.objectContaining({
             'bar': {
                 configuredBy: ['package-b'],
                 script: 'package-a/bar',
@@ -82,22 +72,6 @@ it('resolve extensions', () => {
                 configuredBy: ['package-b', 'package-a'],
                 script: packageDirA + '/foo',
             },
-            'foobar': {
-                configuredBy: ['package-c'],
-                script: packageDirC + '/foobar',
-            },
-            'inline': {
-                configuredBy: ['package-c'],
-                script: expect.objectContaining({ run: expect.any(Function) }),
-            },
-            'inline-require': {
-                configuredBy: ['package-c'],
-                script: expect.objectContaining({ run: expect.any(Function) }),
-            },
-            'inline-main': {
-                configuredBy: [],
-                script: expect.objectContaining({ run: expect.any(Function) }),
-            },
-        },
+        }),
     })
 })

@@ -1,4 +1,4 @@
-import { config, resolvedConfig, script } from '../../src/type'
+import { resolvedConfig, script } from '../../src/type'
 import { printMainUsage, printUsage } from '../../src/util'
 
 function setup() {

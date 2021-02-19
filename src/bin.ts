@@ -1,5 +1,12 @@
 import process from 'process'
 import { run } from './'
 
-export default (): void => void run(process.argv[2], process.argv.slice(3))
-    .catch(code => process.exit(typeof (code) === 'number' ? code : 2))
+export default (): Promise<void> => run(process.argv[2], process.argv.slice(3))
+    .catch(code => {
+        if (typeof (code) === 'number') {
+            process.exit(code)
+        } else {
+            process.stderr.write(`Script "${process.argv[2]}" aborted with error:\n${code}\n`)
+            process.exit(2)
+        }
+    })

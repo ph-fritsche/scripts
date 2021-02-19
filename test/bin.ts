@@ -1,4 +1,4 @@
-import { argv, stdout, stderr } from 'process'
+import { argv, stdout, stderr, exit } from 'process'
 import exampleImport from '../example/import'
 import bin from '../src/bin'
 
@@ -16,10 +16,6 @@ const streamsMock = {
 
 jest.mock('../src/util/import', () => ((module: string) => exampleImport(module)))
 
-function wait(time = 2) {
-    return new Promise(res => setTimeout(res, time))
-}
-
 const exampleDir = __dirname + '/../example'
 const chdir = jest.requireActual('process').chdir
 
@@ -33,10 +29,10 @@ function setup() {
     return {
         getOutput: () => output,
         getErrput: () => errput,
-        run: (args: string[]) => {
+        run: (...args: string[]) => {
             argv.splice(0, argv.length, 'node-bin', 'yarn-scripts-command', ...args)
             chdir(exampleDir)
-            bin()
+            return bin()
         },
     }
 }
@@ -44,9 +40,7 @@ function setup() {
 it('list scripts', async () => {
     const { getOutput, getErrput, run } = setup()
 
-    run([])
-
-    await wait()
+    await run()
 
     expect(getErrput()).toBe('')
     expect(getOutput()).toEqual(expect.stringContaining('Available scripts:'))
@@ -55,9 +49,7 @@ it('list scripts', async () => {
 it('debug config', async () => {
     const { getOutput, getErrput, run } = setup()
 
-    run(['--debug-config'])
-
-    await wait()
+    await run('--debug-config')
 
     expect(getErrput()).toBe('')
     expect(streamsMock.out).toBeCalled()
@@ -70,9 +62,7 @@ it('debug config', async () => {
 it('run "foo" from "package-a"', async () => {
     const { getOutput, getErrput, run } = setup()
 
-    run(['foo'])
-
-    await wait()
+    await run('foo')
 
     expect(getErrput()).toBe('')
     expect(streamsMock.out).toBeCalledWith('foo')
@@ -82,10 +72,26 @@ it('run "foo" from "package-a"', async () => {
 it('run "foo --loud" from "package-a"', async () => {
     const { getOutput, getErrput, run } = setup()
 
-    run(['foo', '--loud'])
-
-    await wait()
+    await run('foo', '--loud')
 
     expect(getErrput()).toBe('')
     expect(getOutput()).toBe('FOO')
+})
+
+it('exit with code from numeric rejection', async () => {
+    const { getErrput, run } = setup()
+
+    await run('exception', '--number')
+
+    expect(exit).toBeCalledWith(123)
+    expect(getErrput()).toMatch(/something went wrong/)
+})
+
+it('write non-numeric rejection to stderr', async () => {
+    const { getErrput, run } = setup()
+
+    await run('exception')
+
+    expect(exit).toBeCalledWith(2)
+    expect(getErrput()).toMatch(/this should not happen/)
 })

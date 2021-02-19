@@ -16,6 +16,7 @@ scripts:
   foobar -> package-c -> node_modules/package-c/foobar.js
   inline -> package-c
   inline-require -> package-c
+  exception -> package-c -> node_modules/package-c/exception.js
   baz0 -> package-a/baz
   inline-main
 "
