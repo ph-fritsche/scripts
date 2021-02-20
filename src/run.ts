@@ -1,15 +1,15 @@
 import { stderr, stdin, stdout } from 'process'
+import type { config } from './type'
 import { getParamsFromArgv, printConfig, printMainUsage, resolveConfig, resolveScript } from './util'
-
-const configBasename = 'scripts.config.js'
 
 export async function run(
     scriptId = '',
     scriptArgs: string[] = [],
+    config?: config,
 ): Promise<void> {
     const streams = { in: stdin, out: stdout, err: stderr }
 
-    const resolvedConfig = await resolveConfig(configBasename)
+    const resolvedConfig = await resolveConfig(config)
 
     if (scriptId === '' || scriptId.startsWith('-')) {
         if (scriptId === '--debug-config') {

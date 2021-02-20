@@ -62,7 +62,12 @@ test('resolve config', async () => {
 
     await expect(run()).rejects.toBe(0)
 
-    expect(utilMock.resolveConfig).toBeCalledWith('scripts.config.js')
+    expect(utilMock.resolveConfig).toBeCalledWith(undefined)
+
+    const conf = {}
+    await expect(run(undefined, [], conf)).rejects.toBe(0)
+
+    expect(utilMock.resolveConfig).toBeCalledWith(conf)
 })
 
 test('print debug information on "--debug-config"', async () => {

@@ -2,8 +2,14 @@ import fs from 'fs'
 import type { config, resolvedConfig } from '../type'
 import dynamicImport from './import'
 
-export async function resolveConfig(configBasename: string): Promise<resolvedConfig> {
-    const configFilename = findConfigFile(configBasename)
+const configBasename = 'scripts.config.js'
+
+export async function resolveConfig(config?: config | string): Promise<resolvedConfig> {
+    if (config && typeof config !== 'string') {
+        return resolveConfigExtensions('[inline]', config)
+    }
+
+    const configFilename = findConfigFile(config || configBasename)
 
     const primaryConfig = configFilename
         ? await dynamicImport(configFilename).then(m => m.default ?? m)

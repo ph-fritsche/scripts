@@ -48,7 +48,7 @@ it('report error for circular reference', () => {
     return expect(config).rejects.toEqual(expect.stringMatching(/circular reference/i))
 })
 
-it('resolve extensions', () => {
+it('resolve config from filename', () => {
     const config = resolveConfig('scripts.config.js')
 
     return expect(config).resolves.toEqual({
@@ -71,6 +71,42 @@ it('resolve extensions', () => {
             'foo': {
                 configuredBy: ['package-b', 'package-a'],
                 script: packageDirA + '/foo',
+            },
+        }),
+    })
+})
+
+it('resolve config object', () => {
+    const config = {
+        extends: [
+            'package-b',
+        ],
+        scripts: {
+            'foo': {
+                run() { return },
+            },
+        },
+    }
+
+    return expect(resolveConfig(config)).resolves.toEqual({
+        configPath: '[inline]',
+        extends: {
+            'package-b': {
+                'package-a': {},
+            },
+        },
+        scripts: expect.objectContaining({
+            'bar': {
+                configuredBy: ['package-b'],
+                script: 'package-a/bar',
+            },
+            'baz': {
+                configuredBy: ['package-b'],
+                script: packageDirB + '/baz',
+            },
+            'foo': {
+                configuredBy: [],
+                script: config.scripts.foo,
             },
         }),
     })
