@@ -57,6 +57,17 @@ module.exports = {
 }
 ```
 
+Run one of the scripts on the command line:
+```js
+$ yarn scripts foo
+```
+
+### Options
+
+`$ yarn scripts --help` prints available scripts
+`$ yarn scripts --debug-config` displays information about the resolved config
+`$ yarn scripts foo --help` prints the options for script `foo`
+
 ## Scripts
 
 ```js
@@ -68,6 +79,58 @@ module.exports = {
     },
     run(params) {
         params.variadicArgs.forEach(l => process.stdout.write(`${l}\n`))
-    }
+    },
 }
 ```
+
+### Options
+
+```js
+    options: {
+        foo: {
+            description: 'Available as --foo flag',
+        },
+        bar: {
+            description: 'Available as --baz and -b flag',
+            long: 'baz',
+            short: 'b',
+        },
+        p: {
+            description: 'This one is -p followed by two values',
+            values: ['x', 'y'],
+        },
+    },
+```
+The script can access the command line options as e.g. `params.options.p.x`
+
+### Arguments
+
+```js
+    requiredArgs: [
+        {
+            id: 'foo',
+            description: 'This one is required.',
+        },
+    ],
+    optionalArgs: [
+        {
+            id: 'bar',
+            description: 'This one can be omitted.',
+        }
+    ],
+```
+The script can access the command line arguments as e.g. `params.args.foo`.
+
+#### Variadic arguments
+
+```js
+    variadicArgs: {
+        id: 'extra',
+        description: 'This allows more arguments to be passed',
+    },
+```
+Variadic Arguments are available as `params.variadicArgs`.
+
+### Exit code
+
+If the `run` function of a script throws the script will exit with either the value of that throw if it is a number - or `2` otherwise.
