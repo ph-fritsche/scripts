@@ -24,7 +24,7 @@ export async function run(
 
     const params = getParamsFromArgv(streams, scriptId, script, scriptArgs)
 
-    script.run(params)
+    await script.run(params)
 }
 
 export type streams = {

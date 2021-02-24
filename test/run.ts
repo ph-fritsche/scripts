@@ -112,3 +112,17 @@ test('run script with resolved params', async () => {
 
     expect(script.run).toBeCalledWith(params)
 })
+
+test('await script', async () => {
+    let a = false
+    const { run } = setup({script: { run: () => new Promise(res => {
+        setTimeout(() => {
+            a = true
+            res()
+        }, 1)
+    })}})
+
+    await expect(run('foo')).resolves.toBe(undefined)
+
+    expect(a).toBe(true)
+})

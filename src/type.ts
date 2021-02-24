@@ -59,5 +59,5 @@ export interface script {
     requiredArgs?: argumentDef[],
     optionalArgs?: argumentDef[],
     variadicArgs?: argumentDef,
-    run: (params: params) => void,
+    run: (params: params) => void | Promise<void>,
 }
