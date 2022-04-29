@@ -1,6 +1,6 @@
 import fs from 'fs'
 import type { config, resolvedConfig } from '../type'
-import dynamicImport from './import'
+import { importDefault } from './importDefaultInterOp'
 
 const configBasename = 'scripts.config.js'
 
@@ -12,7 +12,7 @@ export async function resolveConfig(config?: config | string): Promise<resolvedC
     const configFilename = findConfigFile(config || configBasename)
 
     const primaryConfig = configFilename
-        ? await dynamicImport(configFilename).then(m => m.default ?? m)
+        ? await importDefault<config>(configFilename)
         : {}
 
     return resolveConfigExtensions(configFilename ?? `[not found] ${configBasename}`, primaryConfig)
@@ -41,7 +41,7 @@ async function resolveConfigExtensions(configPath: string, config: config, resol
             throw `Circular reference for "${c}"\n${resolved.join(' -> ')}`
         }
 
-        return dynamicImport(c).then(m => m.default ?? m).then(m => resolveConfigExtensions(c, m, resolved.concat(c)))
+        return importDefault<config>(c).then(m => resolveConfigExtensions(c, m, resolved.concat(c)))
     }))
 
     return imports.then(extendedConfigs => {

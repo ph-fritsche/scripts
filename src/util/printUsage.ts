@@ -16,7 +16,7 @@ export function printMainUsage(config: resolvedConfig, stream: NodeJS.WriteStrea
     const scriptsTable: (string | undefined)[][] = []
     for(const id in config.scripts) {
         const s = config.scripts[id].script
-        scriptsTable.push(['', id, '-->', typeof s === 'string' ? s : `[inline] ${config.scripts[id].configuredBy}`])
+        scriptsTable.push(['', id, '-->', typeof s === 'string' ? s : `[inline] ${config.scripts[id].configuredBy[0]}`])
     }
     printTable(stream, scriptsTable)
 

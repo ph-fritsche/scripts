@@ -14,7 +14,7 @@ export function getOptionIdent(
     if (option[type] === false) {
         return undefined
     } else if (option[type]) {
-        return (prefix ? prefixes[type] : '') + option[type]
+        return (prefix ? prefixes[type] : '') + String(option[type])
     }
 
     if (type === 'short' && id.length === 1 || type === 'long' && id.length > 1) {

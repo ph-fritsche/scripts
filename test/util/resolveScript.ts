@@ -28,7 +28,7 @@ it('resolve package', async () => {
         },
     }, 'a')
 
-    return expect(script).resolves.toBe((await import(exampleDir.concat('node_modules/package-b/echo'))).default)
+    return expect(script).resolves.toBe((await import(exampleDir.concat('node_modules/package-b/echo')) as {default: unknown}).default)
 })
 
 it('resolve inline script', async () => {

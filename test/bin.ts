@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/unbound-method */
+
 import { argv, stdout, stderr, exit } from 'process'
 import exampleImport from '../example/import'
 import bin from '../src/bin'
@@ -17,7 +19,7 @@ const streamsMock = {
 jest.mock('../src/util/import', () => ((module: string) => exampleImport(module)))
 
 const exampleDir = __dirname + '/../example'
-const chdir = jest.requireActual('process').chdir
+const chdir = jest.requireActual<typeof process>('process').chdir
 
 function setup() {
     jest.resetAllMocks()

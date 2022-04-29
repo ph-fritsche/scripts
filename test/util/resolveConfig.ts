@@ -25,7 +25,7 @@ it('resolve with empty scripts object if config does not exist', () => {
     const config = resolveConfig('non-existent-config.js')
 
     return expect(config).resolves.toEqual({
-        configPath: expect.stringContaining('not found'),
+        configPath: expect.stringContaining('not found') as unknown,
         extends: {},
         scripts: {},
     })
@@ -72,7 +72,7 @@ it('resolve config from filename', () => {
                 configuredBy: ['package-b', 'package-a'],
                 script: packageDirA + '/foo',
             },
-        }),
+        }) as unknown,
     })
 })
 
@@ -108,6 +108,6 @@ it('resolve config object', () => {
                 configuredBy: [],
                 script: config.scripts.foo,
             },
-        }),
+        }) as unknown,
     })
 })
