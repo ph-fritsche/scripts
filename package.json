@@ -26,6 +26,6 @@
         "scripts": "node bin/scripts.js",
         "lint": "eslint src test",
         "test": "jest",
-        "build": "tsc"
+        "build": "tsc && cp src/util/import.js dist/util/import.js"
     }
 }
