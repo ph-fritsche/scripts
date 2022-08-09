@@ -4,9 +4,9 @@ import { getParamsFromArgv, printConfig, printMainUsage, resolveConfig, resolveS
 
 jest.mock('process', () => ({
     argv: [],
-    stdin: { read: jest.fn() } as unknown as NodeJS.ReadStream,
-    stdout: { write: jest.fn() } as unknown as NodeJS.WriteStream,
-    stderr: { write: jest.fn() } as unknown as NodeJS.WriteStream,
+    stdin: {},
+    stdout: { write: jest.fn() },
+    stderr: { write: jest.fn() },
 }))
 jest.mock('../src/util', () => ({
     getParamsFromArgv: jest.fn(),
@@ -75,7 +75,7 @@ test('print debug information on "--debug-config"', async () => {
 
     await expect(run('--debug-config')).rejects.toBe(0)
 
-    expect(utilMock.printConfig).toBeCalledWith(config, stdout)
+    expect(utilMock.printConfig).toBeCalledWith(stdout, config)
     expect(utilMock.resolveScript).not.toBeCalled()
 })
 
@@ -84,7 +84,7 @@ test('print help if no scriptId is given', async () => {
 
     await expect(run()).rejects.toBe(0)
 
-    expect(utilMock.printMainUsage).toBeCalledWith(config, stdout)
+    expect(utilMock.printMainUsage).toBeCalledWith(stdout, config)
     expect(utilMock.resolveScript).not.toBeCalled()
 })
 
@@ -93,7 +93,7 @@ test('print help if "--help" comes before scriptId', async () => {
 
     await expect(run('--help', ['anything'])).rejects.toBe(0)
 
-    expect(utilMock.printMainUsage).toBeCalledWith(config, stdout)
+    expect(utilMock.printMainUsage).toBeCalledWith(stdout, config)
     expect(utilMock.resolveScript).not.toBeCalled()
 })
 
@@ -102,7 +102,7 @@ test('pass first argument as scriptId', async () => {
 
     await expect(run('foo', ['a', 'b', 'c'])).resolves.toBe(undefined)
 
-    expect(utilMock.resolveScript).toBeCalledWith({in: stdin, out: stdout, err: stderr}, config.scripts, 'foo')
+    expect(utilMock.resolveScript).toBeCalledWith(stderr, config.scripts, 'foo')
 })
 
 test('run script with resolved params', async () => {
@@ -110,7 +110,7 @@ test('run script with resolved params', async () => {
 
     await expect(run('foo')).resolves.toBe(undefined)
 
-    expect(script.run).toBeCalledWith(params)
+    expect(script.run).toBeCalledWith(params, {in: stdin, out: stdout, err: stderr})
 })
 
 test('await script', async () => {
@@ -125,4 +125,20 @@ test('await script', async () => {
     await expect(run('foo')).resolves.toBe(undefined)
 
     expect(a).toBe(true)
+})
+
+test('inject streams', async () => {
+    const { run, config, params, script } = setup()
+    const streams = {
+        in: {} as NodeJS.ReadStream,
+        out: {} as NodeJS.WriteStream,
+        err: {} as NodeJS.WriteStream,
+    }
+
+    await expect(run('foo', undefined, undefined, streams)).resolves.toBe(undefined)
+    expect(utilMock.resolveScript).toBeCalledWith(streams.err, config.scripts, 'foo')
+    expect(script.run as jest.MockedFunction<typeof script['run']>).toBeCalledWith(params, streams)
+
+    await expect(run('--help', undefined, undefined, streams)).rejects.toBe(0)
+    expect(utilMock.printMainUsage).toBeCalledWith(streams.out, config)
 })

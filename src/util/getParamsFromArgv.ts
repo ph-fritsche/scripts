@@ -1,10 +1,10 @@
-import type { streams } from '../run'
 import type { argumentDef, optionValDef, params, script, stringMap } from '../type'
+import type { WriteStream } from '.'
 import { getOptionIdent } from './getOptionIdent'
 import { printUsage } from './printUsage'
 
 export function getParamsFromArgv(
-    streams: streams,
+    errStream: WriteStream,
     scriptId: string,
     script: script,
     argv: string[],
@@ -18,11 +18,11 @@ export function getParamsFromArgv(
             parseOptions = false
 
         } else if (parseOptions && argv[i] === '--help') {
-            printUsage(scriptId, script, streams.err)
+            printUsage(errStream, scriptId, script)
             throw 0
 
         } else if (parseOptions && argv[i][0] === '-') {
-            i += readOptionArg(streams, scriptId, script, argv, i, params)
+            i += readOptionArg(errStream, scriptId, script, argv, i, params)
 
         } else if (script.requiredArgs && Object.keys(params.args).length < required) {
             const arg = script.requiredArgs[Object.keys(params.args).length]
@@ -36,27 +36,27 @@ export function getParamsFromArgv(
             params.variadic.push(argv[i])
 
         } else {
-            error(streams, scriptId, script, `Extraneous argument: ${argv[i]}`)
+            error(errStream, scriptId, script, `Extraneous argument: ${argv[i]}`)
         }
     }
 
     const found = Object.keys(params.args).length
     if (found < required) {
         const missingArg = (script.requiredArgs as argumentDef[])[found]
-        error(streams, scriptId, script, `Missing argument ${found} "${missingArg.description ?? missingArg.id}"`)
+        error(errStream, scriptId, script, `Missing argument ${found} "${missingArg.description ?? missingArg.id}"`)
     }
 
     return params
 }
 
-function error(streams: streams, scriptId: string, script: script, msg: string) {
-    streams.err.write(`${msg}\n`)
-    printUsage(scriptId, script, streams.err)
+function error(errStream: WriteStream, scriptId: string, script: script, msg: string) {
+    errStream.write(`${msg}\n`)
+    printUsage(errStream, scriptId, script)
     throw 1
 }
 
 function readOptionArg(
-    streams: streams,
+    errStream: WriteStream,
     scriptId: string,
     script: script,
     argv: string[],
@@ -80,7 +80,7 @@ function readOptionArg(
                 return (options[id].value?.length ?? 0)
             }
         }
-        error(streams, scriptId, script, `Unknown option "${argv[index]}"`)
+        error(errStream, scriptId, script, `Unknown option "${argv[index]}"`)
 
     }
 
@@ -102,7 +102,7 @@ function readOptionArg(
             }
         }
         if (!found) {
-            error(streams, scriptId, script, `Unknown option "-${argv[index][i]}"`)
+            error(errStream, scriptId, script, `Unknown option "-${argv[index][i]}"`)
         }
     }
 
@@ -113,7 +113,7 @@ function readOptionArg(
         const o: stringMap = {}
         valueIds.forEach((vId, i) => {
             if (argvSlice.length <= i) {
-                error(streams, scriptId, script, `Missing parameter ${i} "${valueIds[i]}" for option "${namedBy}"`)
+                error(errStream, scriptId, script, `Missing parameter ${i} "${valueIds[i]}" for option "${namedBy}"`)
             }
             o[vId] = argvSlice[i]
         })

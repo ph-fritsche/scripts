@@ -1,4 +1,3 @@
-import type { streams } from '../../src/run'
 import { resolveScript } from '../../src/util'
 import exampleImport from '../../example/import'
 
@@ -10,18 +9,16 @@ function setup() {
     let errput = ''
     return {
         getErrput: () => errput,
-        streams: {
-            err: {
-                write: (c: string) => { errput = errput.concat(c) },
-            },
-        } as unknown as streams,
+        errStream: {
+            write: (c: string) => { errput = errput.concat(c) },
+        },
     }
 }
 
 it('resolve package', async () => {
-    const { streams } = setup()
+    const { errStream } = setup()
 
-    const script = resolveScript(streams, {
+    const script = resolveScript(errStream, {
         a: {
             configuredBy: ['any'],
             script: 'package-b/echo',
@@ -44,17 +41,17 @@ it('resolve inline script', async () => {
             },
         },
     }
-    const { streams } = setup()
+    const { errStream } = setup()
 
-    const script = resolveScript(streams, config, 'a')
+    const script = resolveScript(errStream, config, 'a')
 
     return expect(script).resolves.toBe(config.a.script)
 })
 
 it('report error for undefined script', async () => {
-    const { streams, getErrput } = setup()
+    const { errStream, getErrput } = setup()
 
-    const script = resolveScript(streams, {
+    const script = resolveScript(errStream, {
         a: {
             configuredBy: ['any'],
             script: 'package-b/echo',
@@ -67,9 +64,9 @@ it('report error for undefined script', async () => {
 })
 
 it('report error if the (default) export has no run() method', () => {
-    const { streams, getErrput } = setup()
+    const { errStream, getErrput } = setup()
 
-    const script = resolveScript(streams, {
+    const script = resolveScript(errStream, {
         a: {
             configuredBy: ['any'],
             script: __dirname.concat('/resolveScript'),

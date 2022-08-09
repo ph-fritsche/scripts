@@ -59,5 +59,11 @@ export interface script {
     requiredArgs?: argumentDef[],
     optionalArgs?: argumentDef[],
     variadicArgs?: argumentDef,
-    run: (params: params) => void | Promise<void>,
+    run: (params: params, streams: streams) => void | Promise<void>,
+}
+
+export type streams = {
+    in: NodeJS.ReadStream,
+    out: NodeJS.WriteStream,
+    err: NodeJS.WriteStream,
 }

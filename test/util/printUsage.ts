@@ -3,69 +3,63 @@ import { printMainUsage, printUsage } from '../../src/util'
 
 function setup() {
     let output = ''
-    const stream = { write: (c: string) => { output = output.concat(c) } }
-    const print = (script: Partial<script>) => {
-        output = ''
-        printUsage('myScriptId', script as script, stream as NodeJS.WriteStream)
+    const outStream = { write: (c: string) => { output = output.concat(c) } }
+    return {
+        getOutput: () => output,
+        printUsageFor: (script: Partial<script>) => {
+            output = ''
+            printUsage(outStream, 'myScriptId', script as script)
+        },
+        printMainUsage: (config: resolvedConfig) => {
+            output = ''
+            printMainUsage(outStream, config)
+        },
     }
-
-    return { getOutput: () => output, print }
-}
-
-function setupMain() {
-    let output = ''
-    const stream = { write: (c: string) => { output = output.concat(c) } }
-    const print = (config: resolvedConfig) => {
-        output = ''
-        printMainUsage(config, stream as NodeJS.WriteStream)
-    }
-
-    return { getOutput: () => output, print }
 }
 
 it('print description', () => {
-    const { getOutput, print } = setup()
+    const { getOutput, printUsageFor } = setup()
 
-    print({ description: 'this script does something' })
+    printUsageFor({ description: 'this script does something' })
     expect(getOutput()).toMatch(/this script does something/)
 })
 
 it('print options', () => {
-    const { getOutput, print } = setup()
+    const { getOutput, printUsageFor } = setup()
 
-    print({ options: { a: {description: 'some flag'}, foo: {description: 'bar', value: ['baz']} }})
+    printUsageFor({ options: { a: {description: 'some flag'}, foo: {description: 'bar', value: ['baz']} }})
     expect(getOutput()).toMatch(/-a +some flag/)
     expect(getOutput()).toMatch(/--foo +<baz> +bar/)
 })
 
 it('print required arguments', () => {
-    const { getOutput, print } = setup()
+    const { getOutput, printUsageFor } = setup()
 
-    print({ requiredArgs: [ {id: 'foo', description: 'bar'}]})
+    printUsageFor({ requiredArgs: [ {id: 'foo', description: 'bar'}]})
     expect(getOutput()).toMatch(/myScriptId <foo>/)
     expect(getOutput()).toMatch(/<foo> +bar/)
 })
 
 it('print optional arguments', () => {
-    const { getOutput, print } = setup()
+    const { getOutput, printUsageFor } = setup()
 
-    print({ optionalArgs: [ {id: 'foo', description: 'bar'}]})
+    printUsageFor({ optionalArgs: [ {id: 'foo', description: 'bar'}]})
     expect(getOutput()).toMatch(/myScriptId \[foo]/)
     expect(getOutput()).toMatch(/\[foo] +bar/)
 })
 
 it('print variadic arguments', () => {
-    const { getOutput, print } = setup()
+    const { getOutput, printUsageFor } = setup()
 
-    print({ variadicArgs: {id: 'foo', description: 'bar'}})
+    printUsageFor({ variadicArgs: {id: 'foo', description: 'bar'}})
     expect(getOutput()).toMatch(/myScriptId \[...foo]/)
     expect(getOutput()).toMatch(/\[...foo] +bar/)
 })
 
 it('list available scripts', () => {
-    const { getOutput, print } = setupMain()
+    const { getOutput, printMainUsage } = setup()
 
-    print({
+    printMainUsage({
         configPath: 'any',
         extends: {},
         scripts: {

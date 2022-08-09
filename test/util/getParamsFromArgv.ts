@@ -1,4 +1,3 @@
-import { streams } from '../../src/run'
 import { params, script } from '../../src/type'
 import { getParamsFromArgv, printUsage } from '../../src/util'
 
@@ -8,23 +7,17 @@ jest.mock('../../src/util/printUsage', () => ({
 const printUsageMock = printUsage as jest.Mock<typeof printUsage>
 
 function setup(script: Partial<script>) {
-    const streams = {
-        out: {
-            write: jest.fn(),
-        },
-        err: {
-            write: jest.fn(),
-        },
+    const errStream = {
+        write: jest.fn(),
     }
 
     const wrappedGetParamsFromArgv = (argv: string[]) => {
-        streams.out.write.mockClear()
-        streams.err.write.mockClear()
+        errStream.write.mockClear()
         printUsageMock.mockClear()
-        return getParamsFromArgv(streams as unknown as streams, 'id', script as script, argv)
+        return getParamsFromArgv(errStream, 'id', script as script, argv)
     }
 
-    return { streams, wrappedGetParamsFromArgv }
+    return { errStream, wrappedGetParamsFromArgv }
 }
 
 
@@ -48,17 +41,17 @@ it('report error for missing required argument', () => {
             { id: 'b' },
         ],
     }
-    const { streams, wrappedGetParamsFromArgv } = setup(script)
+    const { errStream, wrappedGetParamsFromArgv } = setup(script)
 
     expect(() => wrappedGetParamsFromArgv(['foo'])).toThrow('1')
 
-    expect(streams.err.write).toHaveBeenCalledWith(expect.stringContaining(`Missing argument 1 "b"`))
-    expect(printUsageMock).toBeCalledWith('id', script, streams.err)
+    expect(errStream.write).toHaveBeenCalledWith(expect.stringContaining(`Missing argument 1 "b"`))
+    expect(printUsageMock).toBeCalledWith(errStream, 'id', script)
 
     expect(() => wrappedGetParamsFromArgv([])).toThrow('1')
 
-    expect(streams.err.write).toHaveBeenCalledWith(expect.stringContaining(`Missing argument 0 "A"`))
-    expect(printUsageMock).toBeCalledWith('id', script, streams.err)
+    expect(errStream.write).toHaveBeenCalledWith(expect.stringContaining(`Missing argument 0 "A"`))
+    expect(printUsageMock).toBeCalledWith(errStream, 'id', script)
 })
 
 it('get optional arguments', () => {
@@ -78,7 +71,7 @@ it('get optional arguments', () => {
 })
 
 it('report error for extraneous argument', () => {
-    const { streams, wrappedGetParamsFromArgv } = setup({
+    const { errStream, wrappedGetParamsFromArgv } = setup({
         optionalArgs: [
             { id: 'a' },
         ],
@@ -86,7 +79,7 @@ it('report error for extraneous argument', () => {
 
     expect(() => wrappedGetParamsFromArgv(['foo', 'bar'])).toThrow()
 
-    expect(streams.err.write).toHaveBeenCalled()
+    expect(errStream.write).toHaveBeenCalled()
 })
 
 it('get variadic arguments', () => {
@@ -169,12 +162,12 @@ it('report error for unknown short option', () => {
     const script = {
         variadicArgs: { id: 'a' },
     }
-    const { streams, wrappedGetParamsFromArgv } = setup(script)
+    const { errStream, wrappedGetParamsFromArgv } = setup(script)
 
     expect(() => wrappedGetParamsFromArgv(['foo', '-b', 'bar'])).toThrow('1')
 
-    expect(streams.err.write).toHaveBeenCalledWith(expect.stringMatching(/unknown option "-b"/i))
-    expect(printUsageMock).toHaveBeenCalledWith('id', script, streams.err)
+    expect(errStream.write).toHaveBeenCalledWith(expect.stringMatching(/unknown option "-b"/i))
+    expect(printUsageMock).toHaveBeenCalledWith(errStream, 'id', script)
 })
 
 it('report error for unknown long option', () => {
@@ -184,12 +177,12 @@ it('report error for unknown long option', () => {
             a: {},
         },
     }
-    const { streams, wrappedGetParamsFromArgv } = setup(script)
+    const { errStream, wrappedGetParamsFromArgv } = setup(script)
 
     expect(() => wrappedGetParamsFromArgv(['foo', '--b', 'bar'])).toThrow('1')
 
-    expect(streams.err.write).toHaveBeenCalledWith(expect.stringMatching(/unknown option "--b"/i))
-    expect(printUsageMock).toHaveBeenCalledWith('id', script, streams.err)
+    expect(errStream.write).toHaveBeenCalledWith(expect.stringMatching(/unknown option "--b"/i))
+    expect(printUsageMock).toHaveBeenCalledWith(errStream, 'id', script)
 })
 
 it('report error for missing option parameter', () => {
@@ -199,12 +192,12 @@ it('report error for missing option parameter', () => {
             a: { value: ['val0', 'val1']},
         },
     }
-    const { streams, wrappedGetParamsFromArgv } = setup(script)
+    const { errStream, wrappedGetParamsFromArgv } = setup(script)
 
     expect(() => wrappedGetParamsFromArgv(['foo', '-a', 'bar'])).toThrow('1')
 
-    expect(streams.err.write).toHaveBeenCalledWith(expect.stringMatching(/missing parameter 1 "val1" for option "-a"/i))
-    expect(printUsageMock).toHaveBeenCalledWith('id', script, streams.err)
+    expect(errStream.write).toHaveBeenCalledWith(expect.stringMatching(/missing parameter 1 "val1" for option "-a"/i))
+    expect(printUsageMock).toHaveBeenCalledWith(errStream, 'id', script)
 })
 
 it('ignore options after "--"', () => {
@@ -227,9 +220,9 @@ it('print usage and report success when arguments include "--help"', () => {
             a: {},
         },
     }
-    const { streams, wrappedGetParamsFromArgv } = setup(script)
+    const { errStream, wrappedGetParamsFromArgv } = setup(script)
 
     expect(() => wrappedGetParamsFromArgv(['foo', '-a', '--help', 'bar'])).toThrow('0')
 
-    expect(printUsageMock).toBeCalledWith('id', script, streams.err)
+    expect(printUsageMock).toBeCalledWith(errStream, 'id', script)
 })

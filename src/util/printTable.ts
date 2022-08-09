@@ -1,5 +1,7 @@
+import type { WriteStream } from '.'
+
 export function printTable(
-    stream: NodeJS.WriteStream,
+    stream: WriteStream,
     table: (string | undefined)[][],
 ): void {
     const width: number[] = []

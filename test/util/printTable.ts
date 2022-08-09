@@ -5,7 +5,7 @@ it('print table', () => {
 
     printTable({
         write: (c: string) => { output = output.concat(c) },
-    } as unknown as NodeJS.WriteStream, [
+    }, [
         [undefined, 'foo', 'bar\nbaz'],
         ['a', undefined, 'b', 'c'],
     ])

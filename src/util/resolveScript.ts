@@ -1,10 +1,10 @@
-import type { streams } from '../run'
 import type { resolvedConfig, script } from '../type'
+import type { WriteStream } from '.'
 import { importDefault } from './importDefaultInterOp'
 
-export async function resolveScript(streams: streams, scripts: resolvedConfig['scripts'], scriptId: string): Promise<script> {
+export async function resolveScript(errStream: WriteStream, scripts: resolvedConfig['scripts'], scriptId: string): Promise<script> {
     if (!scripts || !scripts[scriptId]) {
-        streams.err.write(`Script "${scriptId}" is not defined.\n`)
+        errStream.write(`Script "${scriptId}" is not defined.\n`)
         throw 1
     }
 
@@ -14,15 +14,15 @@ export async function resolveScript(streams: streams, scripts: resolvedConfig['s
             ? await importDefault<script>(scriptDef)
             : scriptDef
 
-        if (typeof script?.run !== 'function') {
-            streams.err.write(`Script ${scriptId} is invalid.\n`)
+        if (typeof script.run !== 'function') {
+            errStream.write(`Script ${scriptId} is invalid.\n`)
             throw 1
         }
 
         return script
 
     } catch (e) {
-        streams.err.write(`Script ${scriptId} could not be found.\n`)
+        errStream.write(`Script ${scriptId} could not be found.\n`)
         throw 1
     }
 }

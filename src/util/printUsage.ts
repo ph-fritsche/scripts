@@ -1,4 +1,5 @@
 import type { resolvedConfig, script } from '../type'
+import type { WriteStream } from '.'
 import { getOptionIdent } from './getOptionIdent'
 import { printTable } from './printTable'
 
@@ -7,7 +8,10 @@ const main = {
     usage: '<scriptId> [options] [...args]',
 }
 
-export function printMainUsage(config: resolvedConfig, stream: NodeJS.WriteStream): void {
+export function printMainUsage(
+    stream: WriteStream,
+    config: resolvedConfig,
+): void {
     stream.write(`\n${main.description}\n`)
 
     stream.write(`\nUsage:${main.usage}\n`)
@@ -23,7 +27,11 @@ export function printMainUsage(config: resolvedConfig, stream: NodeJS.WriteStrea
     stream.write('\n')
 }
 
-export function printUsage(scriptId: string, script: script, stream: NodeJS.WriteStream): void {
+export function printUsage(
+    stream: WriteStream,
+    scriptId: string,
+    script: script,
+): void {
     const cmd = [
         scriptId,
         Object.keys(script.options ?? {}).length && '[options]',
